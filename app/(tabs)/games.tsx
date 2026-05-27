@@ -147,12 +147,16 @@ export default function GamesScreen() {
           return (
             <TouchableOpacity
               key={item.iso}
-              style={[s.dateItem, isSelected && { backgroundColor: colors.accent }]}
+              style={s.dateItem}
               onPress={() => setSelectedDate(item)}
             >
-              <Text style={[s.dayName, isSelected && s.dateTextSelected]}>{item.dayName}</Text>
-              <Text style={[s.dateNum, isSelected && s.dateTextSelected]}>{item.display.split('/')[1]}</Text>
-              {item.isToday && <View style={[s.todayDot, isSelected && s.todayDotSelected]} />}
+              <View style={[s.dayPill, isSelected && { backgroundColor: colors.accent }]}>
+                <Text style={[s.dayName, isSelected && s.dateTextSelected]}>{item.dayName}</Text>
+              </View>
+              <Text style={[s.dateNum, isSelected && { color: colors.accent, fontWeight: 'bold' }]}>
+                {item.display.split('/')[1]}
+              </Text>
+              {item.isToday && <View style={[s.todayDot, isSelected && { backgroundColor: colors.accent }]} />}
             </TouchableOpacity>
           );
         })}
@@ -256,9 +260,10 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors']) => StyleSheet.c
   filterBtn:        { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: c.card, borderWidth: 1, borderColor: c.border },
   filterText:       { fontSize: 13, fontWeight: '600', color: c.accent },
   dateSlider:       { paddingHorizontal: 12, gap: 6, paddingBottom: 12 },
-  dateItem:         { alignItems: 'center', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 10, backgroundColor: c.card, minWidth: 52 },
-  dayName:          { fontSize: 11, color: c.textMuted, marginBottom: 2 },
-  dateNum:          { fontSize: 16, fontWeight: 'bold', color: c.textSub },
+  dateItem:         { alignItems: 'center', paddingVertical: 6, paddingHorizontal: 10, minWidth: 44 },
+  dayPill:          { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: c.card, marginBottom: 4 },
+  dayName:          { fontSize: 12, fontWeight: '600', color: c.textMuted },
+  dateNum:          { fontSize: 13, color: c.textSub },
   dateTextSelected: { color: '#fff' },
   todayDot:         { width: 4, height: 4, borderRadius: 2, backgroundColor: c.accent, marginTop: 3 },
   todayDotSelected: { backgroundColor: '#fff' },
