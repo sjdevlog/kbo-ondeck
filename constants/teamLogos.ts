@@ -1,26 +1,16 @@
 import type React from 'react';
-import { Image } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
 import KiaLogo     from '@/assets/images/teams/kia.svg';
 import DoosanLogo  from '@/assets/images/teams/doosan.svg';
 import SamsungLogo from '@/assets/images/teams/samsung.svg';
 import LotteLogo   from '@/assets/images/teams/lotte.svg';
+import NcLogo      from '@/constants/NcLogo';
 import LgLogo      from '@/assets/images/teams/lg.svg';
 import SsgLogo     from '@/assets/images/teams/ssg.svg';
 import KtLogo      from '@/assets/images/teams/kt.svg';
 import HanwhaLogo  from '@/assets/images/teams/hanwha.svg';
 import KiwoomLogo  from '@/assets/images/teams/kiwoom.svg';
-
-const ncPng = require('@/assets/images/teams/nc.png');
-
-const NcLogo: React.FC<SvgProps> = ({ width = 38, height = 38 }) => (
-  <Image
-    source={ncPng}
-    style={{ width: Number(width), height: Number(height) }}
-    resizeMode="contain"
-  />
-);
 
 export const TEAM_LOGOS: Record<string, React.FC<SvgProps>> = {
   'KIA 타이거즈':  KiaLogo,
