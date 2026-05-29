@@ -147,16 +147,12 @@ export default function GamesScreen() {
           return (
             <TouchableOpacity
               key={item.iso}
-              style={s.dateItem}
+              style={[s.dateItem, isSelected && { backgroundColor: colors.accent }]}
               onPress={() => setSelectedDate(item)}
             >
-              <View style={[s.dayPill, isSelected && { backgroundColor: colors.accent }]}>
-                <Text style={[s.dayName, isSelected && s.dateTextSelected]}>{item.dayName}</Text>
-              </View>
-              <Text style={[s.dateNum, isSelected && { color: colors.accent, fontWeight: 'bold' }]}>
-                {item.display.split('/')[1]}
-              </Text>
-              {item.isToday && <View style={[s.todayDot, isSelected && { backgroundColor: colors.accent }]} />}
+              <Text style={[s.dayName, isSelected && { color: 'rgba(255,255,255,0.8)' }]}>{item.dayName}</Text>
+              <Text style={[s.dateNum, isSelected && { color: '#fff' }]}>{item.display.split('/')[1]}</Text>
+              {item.isToday && !isSelected && <View style={s.todayDot} />}
             </TouchableOpacity>
           );
         })}
@@ -259,13 +255,13 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors']) => StyleSheet.c
   title:            { fontSize: 20, fontWeight: 'bold', color: c.text },
   filterBtn:        { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: c.card, borderWidth: 1, borderColor: c.border },
   filterText:       { fontSize: 13, fontWeight: '600', color: c.accent },
-  dateSlider:       { paddingHorizontal: 12, gap: 6, paddingBottom: 12 },
-  dateItem:         { alignItems: 'center', paddingVertical: 6, paddingHorizontal: 10, minWidth: 44 },
-  dayPill:          { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: c.card, marginBottom: 4 },
-  dayName:          { fontSize: 12, fontWeight: '600', color: c.textMuted },
-  dateNum:          { fontSize: 13, color: c.textSub },
+  dateSlider:       { paddingHorizontal: 12, gap: 6, paddingVertical: 10 },
+  dateItem:         { alignItems: 'center', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12, backgroundColor: c.card, minWidth: 52 },
+  dayPill:          {},
+  dayName:          { fontSize: 11, color: c.textMuted, marginBottom: 3 },
+  dateNum:          { fontSize: 17, fontWeight: 'bold', color: c.text },
   dateTextSelected: { color: '#fff' },
-  todayDot:         { width: 4, height: 4, borderRadius: 2, backgroundColor: c.accent, marginTop: 3 },
+  todayDot:         { width: 4, height: 4, borderRadius: 2, backgroundColor: c.accent, marginTop: 4 },
   todayDotSelected: { backgroundColor: '#fff' },
   errorBanner:      { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 16, marginBottom: 8, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1 },
   errorText:        { fontSize: 12 },
