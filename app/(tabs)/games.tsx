@@ -141,6 +141,7 @@ export default function GamesScreen() {
       </View>
 
       {/* 날짜 슬라이더 */}
+      <View style={s.dateSliderWrap}>
       <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.dateSlider}>
         {WEEK.map((item) => {
           const isSelected = selectedDate.iso === item.iso;
@@ -157,6 +158,7 @@ export default function GamesScreen() {
           );
         })}
       </ScrollView>
+      </View>
 
       {/* 날씨 에러 배너 */}
       {weatherError && !weatherLoading && (
@@ -255,6 +257,7 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors']) => StyleSheet.c
   title:            { fontSize: 20, fontWeight: 'bold', color: c.text },
   filterBtn:        { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: c.card, borderWidth: 1, borderColor: c.border },
   filterText:       { fontSize: 13, fontWeight: '600', color: c.accent },
+  dateSliderWrap:   { backgroundColor: c.card, borderBottomWidth: 1, borderBottomColor: c.border },
   dateSlider:       { paddingHorizontal: 12, gap: 6, paddingVertical: 10 },
   dateItem:         { alignItems: 'center', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12, backgroundColor: c.card, minWidth: 52 },
   dayPill:          {},
