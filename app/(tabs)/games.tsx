@@ -23,24 +23,18 @@ const KR_DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 function getWeekDates() {
   const today = new Date();
-  const dates = [];
-  let offset = 0;
-  while (dates.length < 7) {
+  return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today);
-    d.setDate(today.getDate() + offset);
-    if (d.getDay() !== 1) {
-      const m = d.getMonth() + 1;
-      const day = d.getDate();
-      dates.push({
-        display: `${m}/${day}`,
-        iso: d.toISOString().split('T')[0],
-        dayName: KR_DAYS[d.getDay()],
-        isToday: offset === 0,
-      });
-    }
-    offset++;
-  }
-  return dates;
+    d.setDate(today.getDate() + i);
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    return {
+      display: `${m}/${day}`,
+      iso: d.toISOString().split('T')[0],
+      dayName: KR_DAYS[d.getDay()],
+      isToday: i === 0,
+    };
+  });
 }
 
 // ---------- 목업데이터 (실제 API 연동 전 임시) ----------
