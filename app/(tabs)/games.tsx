@@ -1,12 +1,12 @@
+import { EmptyState } from '@/components/ui/EmptyState';
+import { GameCardSkeleton } from '@/components/ui/SkeletonBox';
 import { TEAM_COLORS } from '@/constants/teamColors';
 import { TEAM_LOGOS } from '@/constants/teamLogos';
 import { useFavoriteTeam } from '@/context/FavoriteTeamContext';
 import { useAppTheme } from '@/context/ThemeContext';
 import { useStadiumWeather } from '@/hooks/useStadiumWeather';
-import { GameCardSkeleton } from '@/components/ui/SkeletonBox';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { Ionicons } from '@expo/vector-icons';
-import { useRef, useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -23,40 +23,46 @@ const KR_DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 function getWeekDates() {
   const today = new Date();
-  return Array.from({ length: 7 }, (_, i) => {
+  const dates = [];
+  let offset = 0;
+  while (dates.length < 7) {
     const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const m = d.getMonth() + 1;
-    const day = d.getDate();
-    return {
-      display: `${m}/${day}`,
-      iso: d.toISOString().split('T')[0],
-      dayName: KR_DAYS[d.getDay()],
-      isToday: i === 0,
-    };
-  });
+    d.setDate(today.getDate() + offset);
+    if (d.getDay() !== 1) {
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      dates.push({
+        display: `${m}/${day}`,
+        iso: d.toISOString().split('T')[0],
+        dayName: KR_DAYS[d.getDay()],
+        isToday: offset === 0,
+      });
+    }
+    offset++;
+  }
+  return dates;
 }
 
-// ---------- 목데이터 (실제 API 연동 전 임시) ----------
+// ---------- 목업데이터 (실제 API 연동 전 임시) ----------
 // TODO: replace with real KBO schedule API
 const SCHEDULE: Record<string, Game[]> = {
   // 오늘(5/27 화) — 평일
   get [getWeekDates()[0].display]() {
     return [
-      { away: 'KIA 타이거즈',  home: 'LG 트윈스',    time: '18:30', stadium: '잠실',              broadcast: 'KBS N 스포츠' },
-      { away: '두산 베어스',   home: 'SSG 랜더스',   time: '18:30', stadium: '인천SSG랜더스필드',   broadcast: '스포티비' },
-      { away: '삼성 라이온즈', home: 'NC 다이노스',   time: '18:30', stadium: '창원NC파크',          broadcast: 'MBC스포츠+' },
-      { away: '한화 이글스',   home: '롯데 자이언츠', time: '18:30', stadium: '사직',               broadcast: '스포티비2' },
-      { away: '키움 히어로즈', home: 'KT 위즈',      time: '18:30', stadium: '수원KT위즈파크',      broadcast: 'TVING' },
+      { away: 'KIA 타이거즈',  home: 'LG 트윈스',    time: '18:30', stadium: '잠실',               broadcast: 'KBS N 스포츠' },
+      { away: '두산 베어스',   home: 'SSG 랜더스',   time: '18:30', stadium: '인천SSG랜더스필드',  broadcast: '스포티비' },
+      { away: '삼성 라이온즈', home: 'NC 다이노스',  time: '18:30', stadium: '창원NC파크',         broadcast: 'MBC스포츠+' },
+      { away: '한화 이글스',   home: '롯데 자이언츠',time: '18:30', stadium: '사직',               broadcast: '스포티비2' },
+      { away: '키움 히어로즈', home: 'KT 위즈',      time: '18:30', stadium: '수원KT위즈파크',     broadcast: 'TVING' },
     ];
   },
   get [getWeekDates()[1].display]() {
     return [
       { away: 'LG 트윈스',    home: 'KIA 타이거즈',  time: '18:30', stadium: '광주기아챔피언스필드', broadcast: 'KBS N 스포츠' },
-      { away: 'SSG 랜더스',   home: '두산 베어스',   time: '18:30', stadium: '잠실',               broadcast: '스포티비' },
+      { away: 'SSG 랜더스',   home: '두산 베어스',   time: '18:30', stadium: '잠실',                 broadcast: '스포티비' },
       { away: 'NC 다이노스',  home: '삼성 라이온즈', time: '18:30', stadium: '대구삼성라이온즈파크', broadcast: 'MBC스포츠+' },
-      { away: '롯데 자이언츠', home: '한화 이글스',   time: '18:30', stadium: '대전한화생명볼파크',  broadcast: '스포티비2' },
-      { away: 'KT 위즈',      home: '키움 히어로즈', time: '18:30', stadium: '고척스카이돔',        broadcast: 'TVING' },
+      { away: '롯데 자이언츠', home: '한화 이글스',  time: '18:30', stadium: '대전한화생명볼파크',   broadcast: '스포티비2' },
+      { away: 'KT 위즈',      home: '키움 히어로즈', time: '18:30', stadium: '고척스카이돔',         broadcast: 'TVING' },
     ];
   },
   get [getWeekDates()[2].display]() { return []; }, // 목 — 경기 없음

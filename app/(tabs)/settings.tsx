@@ -1,6 +1,9 @@
 import { TEAM_COLORS } from '@/constants/teamColors';
+import { TEAM_LOGOS } from '@/constants/teamLogos';
 import { useFavoriteTeam } from '@/context/FavoriteTeamContext';
+import { useAppTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,32 +11,37 @@ const TEAMS = Object.keys(TEAM_COLORS);
 
 export default function SettingsScreen() {
   const { favoriteTeam, setFavoriteTeam } = useFavoriteTeam();
+  const { colors, isDark } = useAppTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>내 팀 설정</Text>
-      <Text style={styles.subtitle}>순위표에서 내 팀을 강조 표시합니다</Text>
-      <ScrollView contentContainerStyle={styles.list}>
+    <SafeAreaView style={s.container}>
+      <Text style={s.title}>내 팀 설정</Text>
+      <Text style={s.subtitle}>응원 팀을 선택하면 해당 팀 경기를 강조 표시합니다</Text>
+      <ScrollView contentContainerStyle={s.grid}>
         {TEAMS.map((team) => {
           const selected = favoriteTeam === team;
-          const colors = TEAM_COLORS[team];
+          const tc = TEAM_COLORS[team];
+          const Logo = TEAM_LOGOS[team];
+          const badgeBg = isDark ? tc.background : tc.lightBg;
           return (
             <TouchableOpacity
               key={team}
-              style={[
-                styles.teamRow,
-                selected && { backgroundColor: colors.background, borderColor: colors.primary },
-              ]}
+              style={[s.teamCard, selected && { borderColor: tc.primary, borderWidth: 2 }]}
               onPress={() => setFavoriteTeam(selected ? null : team)}
               activeOpacity={0.7}
             >
-              <View style={styles.teamLeft}>
-                <View style={[styles.colorDot, { backgroundColor: colors.primary }]} />
-                <Text style={[styles.teamName, selected && styles.teamNameSelected]}>{team}</Text>
-              </View>
               {selected && (
-                <Ionicons name="checkmark-circle" size={22} color={colors.primary} />
+                <View style={[s.checkBadge, { backgroundColor: tc.primary }]}>
+                  <Ionicons name="checkmark" size={10} color="#fff" />
+                </View>
               )}
+              <View style={[s.logoBadge, { backgroundColor: badgeBg, borderColor: tc.primary }]}>
+                {Logo && <Logo width={44} height={44} />}
+              </View>
+              <Text style={[s.teamName, selected && { color: tc.primary, fontWeight: '700' }]} numberOfLines={2}>
+                {team}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -42,57 +50,40 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#f8fafc',
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 4,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: '#64748b',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  list: {
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  teamRow: {
-    flexDirection: 'row',
+const makeStyles = (c: ReturnType<typeof useAppTheme>['colors']) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.bg },
+  title:     { fontSize: 20, fontWeight: 'bold', color: c.text, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4 },
+  subtitle:  { fontSize: 13, color: c.textMuted, paddingHorizontal: 16, paddingBottom: 16 },
+  grid:      { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, gap: 10, paddingBottom: 24 },
+  teamCard:  {
+    width: '30%',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#1e293b',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
+    backgroundColor: c.card,
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
     borderWidth: 1.5,
-    borderColor: 'transparent',
+    borderColor: c.border,
+    position: 'relative',
   },
-  teamLeft: {
-    flexDirection: 'row',
+  logoBadge: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
+    marginBottom: 8,
   },
-  colorDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  teamName: {
-    fontSize: 16,
-    color: '#cbd5e1',
-    fontWeight: '500',
-  },
-  teamNameSelected: {
-    color: '#f8fafc',
-    fontWeight: '700',
+  teamName:  { fontSize: 11, color: c.textMuted, textAlign: 'center', lineHeight: 15 },
+  checkBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
