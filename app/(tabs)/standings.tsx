@@ -2,7 +2,8 @@ import { TEAM_COLORS } from '@/constants/teamColors';
 import { TEAM_LOGOS } from '@/constants/teamLogos';
 import { useFavoriteTeam } from '@/context/FavoriteTeamContext';
 import { useAppTheme } from '@/context/ThemeContext';
-import { useMemo, useState } from 'react';
+import { api } from '@/services/api';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -85,24 +86,36 @@ export default function StandingsScreen() {
   const [mainTab, setMainTab] = useState<MainTab>('순위');
   const [statTab, setStatTab] = useState<StatTab>('타격');
 
+  const [standings, setStandings] = useState(STANDINGS);
+  const [batting, setBatting] = useState(TEAM_BATTING);
+  const [pitching, setPitching] = useState(TEAM_PITCHING);
+
+  useEffect(() => {
+    api.standings().then((d) => setStandings(d as typeof STANDINGS)).catch(() => {});
+    api.teamBatting().then((d) => setBatting(d as typeof TEAM_BATTING)).catch(() => {});
+    api.teamPitching().then((d) => setPitching(d as typeof TEAM_PITCHING)).catch(() => {});
+  }, []);
+
   // 팀 기록: 선택한 컬럼 기준 정렬
   const [sortKey, setSortKey] = useState<string>('hr');
   const sortedTeams = useMemo(() => {
-    const names = STANDINGS.map(t => t.name);
+    const names = standings.map((t: any) => t.name);
     return [...names].sort((a, b) => {
-      const va = statTab === '타격'
-        ? (BATTING_STATS[a] as any)[sortKey]
-        : (PITCHING_STATS[a] as any)[sortKey];
-      const vb = statTab === '타격'
-        ? (BATTING_STATS[b] as any)[sortKey]
-        : (PITCHING_STATS[b] as any)[sortKey];
+      const aRow = statTab === '타격'
+        ? batting.find((r: any) => r.team === a)
+        : pitching.find((r: any) => r.team === a);
+      const bRow = statTab === '타격'
+        ? batting.find((r: any) => r.team === b)
+        : pitching.find((r: any) => r.team === b);
+      const va = (aRow as any)?.[sortKey] ?? 0;
+      const vb = (bRow as any)?.[sortKey] ?? 0;
       const numA = parseFloat(String(va));
       const numB = parseFloat(String(vb));
       // ERA, WHIP, 볼넷은 낮을수록 좋음
       const ascending = ['era', 'whip', 'bb'].includes(sortKey);
       return ascending ? numA - numB : numB - numA;
     });
-  }, [sortKey, statTab]);
+  }, [sortKey, statTab, batting, pitching, standings]);
 
   return (
     <SafeAreaView style={s.container}>
@@ -131,7 +144,7 @@ export default function StandingsScreen() {
               ))}
             </View>
             <ScrollView>
-              {STANDINGS.map((t, i) => {
+              {standings.map((t: any, i: number) => {
                 const isFav = favoriteTeam === t.name;
                 const tc = TEAM_COLORS[t.name];
                 const isWin = t.streak.includes('승');
@@ -196,8 +209,8 @@ export default function StandingsScreen() {
                   const isFav = favoriteTeam === name;
                   const tc = TEAM_COLORS[name];
                   const Logo = TEAM_LOGOS[name];
-                  const bStats = BATTING_STATS[name];
-                  const pStats = PITCHING_STATS[name];
+                  const bStats = batting.find((r: any) => r.team === name);
+                  const pStats = pitching.find((r: any) => r.team === name);
                   const cols = statTab === '타격' ? BATTING_COLS : PITCHING_COLS;
                   return (
                     <View key={name} style={[s.row, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
@@ -207,7 +220,7 @@ export default function StandingsScreen() {
                         <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{tc.short}</Text>
                       </View>
                       {cols.map(col => {
-                        const val = statTab === '타격' ? (bStats as any)[col.key] : (pStats as any)[col.key];
+                        const val = statTab === '타격' ? (bStats as any)?.[col.key] : (pStats as any)?.[col.key];
                         const isSort = sortKey === col.key;
                         return (
                           <Text key={col.key} style={[s.cell, { width: col.width }, isSort && s.sortedCell, isFav && { color: tc.primary }]}>
