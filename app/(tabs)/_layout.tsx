@@ -35,14 +35,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="standings"
         options={{
-          title: '팀순위',
+          title: '팀',
           tabBarIcon: ({ color }) => <IconSymbol size={26} name="list.number" color={color} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
-          title: '선수기록',
+          title: '선수',
           tabBarIcon: ({ color }) => <IconSymbol size={26} name="person.2.fill" color={color} />,
         }}
       />
