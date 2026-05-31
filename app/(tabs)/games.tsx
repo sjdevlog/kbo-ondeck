@@ -39,64 +39,32 @@ function getWeekDates() {
 
 // ---------- 목업데이터 (실제 API 연동 전 임시) ----------
 // TODO: replace with real KBO schedule API
-const SCHEDULE: Record<string, Game[]> = {
-  // 오늘(5/27 화) — 평일
-  get [getWeekDates()[0].display]() {
-    return [
-      { away: 'KIA 타이거즈',  home: 'LG 트윈스',    time: '18:30', stadium: '잠실',               broadcast: 'KBS N 스포츠' },
-      { away: '두산 베어스',   home: 'SSG 랜더스',   time: '18:30', stadium: '인천SSG랜더스필드',  broadcast: '스포티비' },
-      { away: '삼성 라이온즈', home: 'NC 다이노스',  time: '18:30', stadium: '창원NC파크',         broadcast: 'MBC스포츠+' },
-      { away: '한화 이글스',   home: '롯데 자이언츠',time: '18:30', stadium: '사직',               broadcast: '스포티비2' },
-      { away: '키움 히어로즈', home: 'KT 위즈',      time: '18:30', stadium: '수원KT위즈파크',     broadcast: 'TVING' },
-    ];
-  },
-  get [getWeekDates()[1].display]() {
-    return [
-      { away: 'LG 트윈스',    home: 'KIA 타이거즈',  time: '18:30', stadium: '광주기아챔피언스필드', broadcast: 'KBS N 스포츠' },
-      { away: 'SSG 랜더스',   home: '두산 베어스',   time: '18:30', stadium: '잠실',                 broadcast: '스포티비' },
-      { away: 'NC 다이노스',  home: '삼성 라이온즈', time: '18:30', stadium: '대구삼성라이온즈파크', broadcast: 'MBC스포츠+' },
-      { away: '롯데 자이언츠', home: '한화 이글스',  time: '18:30', stadium: '대전한화생명볼파크',   broadcast: '스포티비2' },
-      { away: 'KT 위즈',      home: '키움 히어로즈', time: '18:30', stadium: '고척스카이돔',         broadcast: 'TVING' },
-    ];
-  },
-  get [getWeekDates()[2].display]() { return []; }, // 목 — 경기 없음
-  get [getWeekDates()[3].display]() {
-    return [
-      { away: 'KIA 타이거즈',  home: '두산 베어스',   time: '18:30', stadium: '잠실',              broadcast: 'KBS N 스포츠' },
-      { away: 'LG 트윈스',    home: 'SSG 랜더스',    time: '18:30', stadium: '인천SSG랜더스필드',   broadcast: '스포티비' },
-      { away: '삼성 라이온즈', home: '한화 이글스',   time: '18:30', stadium: '대전한화생명볼파크',  broadcast: 'MBC스포츠+' },
-      { away: 'NC 다이노스',  home: '롯데 자이언츠', time: '18:30', stadium: '사직',               broadcast: '스포티비2' },
-      { away: '키움 히어로즈', home: 'KT 위즈',       time: '18:30', stadium: '수원KT위즈파크',     broadcast: 'TVING' },
-    ];
-  },
-  get [getWeekDates()[4].display]() {
-    return [
-      { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '14:00', stadium: '광주기아챔피언스필드', broadcast: 'KBS N 스포츠' },
-      { away: 'SSG 랜더스',   home: 'LG 트윈스',     time: '14:00', stadium: '잠실',               broadcast: '스포티비' },
-      { away: '한화 이글스',   home: '삼성 라이온즈', time: '14:00', stadium: '대구삼성라이온즈파크', broadcast: 'MBC스포츠+' },
-      { away: '롯데 자이언츠', home: 'NC 다이노스',   time: '14:00', stadium: '창원NC파크',          broadcast: '스포티비2' },
-      { away: 'KT 위즈',      home: '키움 히어로즈', time: '14:00', stadium: '고척스카이돔',        broadcast: 'TVING' },
-    ];
-  },
-  get [getWeekDates()[5].display]() {
-    return [
-      { away: 'KIA 타이거즈',  home: '두산 베어스',   time: '14:00', stadium: '잠실',              broadcast: 'KBS N 스포츠' },
-      { away: 'LG 트윈스',    home: 'SSG 랜더스',    time: '14:00', stadium: '인천SSG랜더스필드',   broadcast: '스포티비' },
-      { away: '삼성 라이온즈', home: '한화 이글스',   time: '14:00', stadium: '대전한화생명볼파크',  broadcast: 'MBC스포츠+' },
-      { away: 'NC 다이노스',  home: '롯데 자이언츠', time: '14:00', stadium: '사직',               broadcast: '스포티비2' },
-      { away: '키움 히어로즈', home: 'KT 위즈',       time: '14:00', stadium: '수원KT위즈파크',     broadcast: 'TVING' },
-    ];
-  },
-  get [getWeekDates()[6].display]() {
-    return [
-      { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '14:00', stadium: '광주기아챔피언스필드', broadcast: 'KBS N 스포츠' },
-      { away: 'SSG 랜더스',   home: 'LG 트윈스',     time: '14:00', stadium: '잠실',               broadcast: '스포티비' },
-      { away: '한화 이글스',   home: '삼성 라이온즈', time: '14:00', stadium: '대구삼성라이온즈파크', broadcast: 'MBC스포츠+' },
-      { away: '롯데 자이언츠', home: 'NC 다이노스',   time: '14:00', stadium: '창원NC파크',          broadcast: '스포티비2' },
-      { away: 'KT 위즈',      home: '키움 히어로즈', time: '14:00', stadium: '고척스카이돔',        broadcast: 'TVING' },
-    ];
-  },
-};
+
+const WEEKDAY_GAMES: Game[] = [
+  { away: 'KIA 타이거즈',  home: 'LG 트윈스',     time: '18:30', stadium: '잠실',                  broadcast: 'KBS N 스포츠' },
+  { away: '두산 베어스',   home: 'SSG 랜더스',    time: '18:30', stadium: '인천SSG랜더스필드',     broadcast: '스포티비' },
+  { away: '삼성 라이온즈', home: 'NC 다이노스',   time: '18:30', stadium: '창원NC파크',            broadcast: 'MBC스포츠+' },
+  { away: '한화 이글스',  home: '롯데 자이언츠',  time: '18:30', stadium: '사직',                  broadcast: '스포티비2' },
+  { away: '키움 히어로즈', home: 'KT 위즈',       time: '18:30', stadium: '수원KT위즈파크',        broadcast: 'TVING' },
+];
+
+const WEEKEND_GAMES: Game[] = [
+  { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '14:00', stadium: '광주기아챔피언스필드',  broadcast: 'KBS N 스포츠' },
+  { away: 'SSG 랜더스',   home: 'LG 트윈스',     time: '14:00', stadium: '잠실',                  broadcast: '스포티비' },
+  { away: 'NC 다이노스',  home: '삼성 라이온즈',  time: '14:00', stadium: '대구삼성라이온즈파크',  broadcast: 'MBC스포츠+' },
+  { away: '롯데 자이언츠', home: '한화 이글스',   time: '14:00', stadium: '대전한화생명볼파크',    broadcast: '스포티비2' },
+  { away: 'KT 위즈',      home: '키움 히어로즈',  time: '14:00', stadium: '고척스카이돔',          broadcast: 'TVING' },
+];
+
+function gamesForDow(dow: number): Game[] {
+  if (dow === 1) return [];               // 월요일 — 경기 없음
+  if (dow === 0 || dow === 6) return WEEKEND_GAMES; // 토·일
+  return WEEKDAY_GAMES;                   // 화~금
+}
+
+const SCHEDULE: Record<string, Game[]> = Object.fromEntries(
+  getWeekDates().map((d) => [d.display, gamesForDow(new Date(d.iso + 'T00:00:00').getDay())])
+);
 
 // ---------- 컴포넌트 ----------
 export default function GamesScreen() {
