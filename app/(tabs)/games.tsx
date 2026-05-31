@@ -19,6 +19,7 @@ export type Game = {
   stadium: string;
   broadcast: string;
   cancelled?: CancelReason;
+  doubleheader?: 1 | 2;
 };
 
 const CANCEL_BADGE: Record<CancelReason, { icon: string; label: string; bg: string; color: string }> = {
@@ -60,7 +61,8 @@ const WEEKDAY_GAMES: Game[] = [
 ];
 
 const WEEKEND_GAMES: Game[] = [
-  { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '14:00', stadium: '광주기아챔피언스필드',  broadcast: 'KBS N 스포츠' },
+  { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '13:00', stadium: '광주기아챔피언스필드',  broadcast: 'KBS N 스포츠', doubleheader: 1 },
+  { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '17:00', stadium: '광주기아챔피언스필드',  broadcast: 'KBS N 스포츠', doubleheader: 2 },
   { away: 'SSG 랜더스',   home: 'LG 트윈스',     time: '14:00', stadium: '잠실',                  broadcast: '스포티비', cancelled: '강풍' },
   { away: 'NC 다이노스',  home: '삼성 라이온즈',  time: '14:00', stadium: '대구삼성라이온즈파크',  broadcast: 'MBC스포츠+' },
   { away: '롯데 자이언츠', home: '한화 이글스',   time: '14:00', stadium: '대전한화생명볼파크',    broadcast: '스포티비2', cancelled: '폭염' },
@@ -195,6 +197,9 @@ export default function GamesScreen() {
                   </View>
 
                   <View style={s.gameCenter}>
+                    {g.doubleheader && (
+                      <Text style={s.doubleheaderText}>더블헤더 {g.doubleheader}차전</Text>
+                    )}
                     <Text style={[s.gameTime, g.cancelled && s.fadedText]}>{g.time}</Text>
                     <Text style={s.gameStadium}>{g.stadium}</Text>
                     {g.cancelled ? (
@@ -261,6 +266,7 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors'], isDark: boolean
   gameCardCancelled:   { backgroundColor: isDark ? '#1a1a2e' : '#f1f5f9', borderColor: '#cbd5e1' },
   badgeCancelled:      { opacity: 0.4 },
   fadedText:           { color: c.textMuted },
+  doubleheaderText:    { fontSize: 11, fontWeight: '600', color: '#1d4ed8', marginBottom: 4 },
   cancelledRow:        { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8, backgroundColor: '#dbeafe', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
   cancelledIcon:       { fontSize: 16 },
   cancelledText:       { fontSize: 13, fontWeight: '700', color: '#1d4ed8' },
