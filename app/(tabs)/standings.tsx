@@ -127,7 +127,7 @@ export default function StandingsScreen() {
           <View>
             <View style={s.headerRow}>
               {['순위','팀','경기','승','패','무','승률','GB','최근10G','연속'].map((h, i) => (
-                <Text key={h} style={[s.headerCell, { width: [36,110,40,32,32,32,56,44,80,60][i] }]}>{h}</Text>
+                <Text key={h} style={[s.headerCell, { width: [36,90,40,32,32,32,56,44,80,60][i] }]}>{h}</Text>
               ))}
             </View>
             <ScrollView>
@@ -139,9 +139,9 @@ export default function StandingsScreen() {
                 return (
                   <View key={t.name} style={[s.row, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
                     <Text style={[s.cell, { width: 36 },  isFav && { color: tc.primary, fontWeight: 'bold' }]}>{t.rank}</Text>
-                    <View style={[s.nameCell, { width: 110 }]}>
+                    <View style={[s.nameCell, { width: 90 }]}>
                       <Logo width={24} height={24} />
-                      <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]} numberOfLines={1}>{t.name}</Text>
+                      <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{tc.short}</Text>
                     </View>
                     <Text style={[s.cell, { width: 40 }, isFav && { color: tc.primary }]}>{t.games}</Text>
                     <Text style={[s.cell, s.win,  { width: 32 }]}>{t.win}</Text>
