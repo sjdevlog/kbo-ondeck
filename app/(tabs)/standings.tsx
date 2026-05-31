@@ -87,9 +87,19 @@ export default function StandingsScreen() {
 
   // 팀 기록: 선택한 컬럼 기준 정렬
   const [sortKey, setSortKey] = useState<string>('hr');
+
+  const pinnedStandings = useMemo(() => {
+    if (!favoriteTeam) return STANDINGS;
+    return [...STANDINGS].sort((a, b) =>
+      a.name === favoriteTeam ? -1 : b.name === favoriteTeam ? 1 : 0
+    );
+  }, [favoriteTeam]);
+
   const sortedTeams = useMemo(() => {
     const names = STANDINGS.map(t => t.name);
     return [...names].sort((a, b) => {
+      if (a === favoriteTeam) return -1;
+      if (b === favoriteTeam) return 1;
       const va = statTab === '타격'
         ? (BATTING_STATS[a] as any)[sortKey]
         : (PITCHING_STATS[a] as any)[sortKey];
@@ -131,7 +141,7 @@ export default function StandingsScreen() {
               ))}
             </View>
             <ScrollView>
-              {STANDINGS.map((t, i) => {
+              {pinnedStandings.map((t, i) => {
                 const isFav = favoriteTeam === t.name;
                 const tc = TEAM_COLORS[t.name];
                 const isWin = t.streak.includes('승');
