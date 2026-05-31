@@ -138,7 +138,7 @@ export default function StandingsScreen() {
         // ── 순위 테이블 ──────────────────────────────────────
         <View style={{ flex: 1 }}>
           <View style={[s.headerRow, { paddingHorizontal: 0 }]}>
-            {[{h:'순위',f:0.6},{h:'팀',f:1.8},{h:'경기',f:0.8},{h:'승',f:0.7},{h:'패',f:0.7},{h:'무',f:0.7},{h:'승률',f:1.0},{h:'GB',f:0.8}].map(({h,f}) => (
+            {[{h:'순위',f:0.6},{h:'팀',f:1.8},{h:'경기',f:0.8},{h:'승',f:0.7},{h:'패',f:0.7},{h:'무',f:0.7},{h:'승률',f:1.0},{h:'GB',f:0.8},{h:'연속',f:0.9}].map(({h,f}) => (
               <Text key={h} style={[s.headerCell, { flex: f }]}>{h}</Text>
             ))}
           </View>
@@ -160,6 +160,7 @@ export default function StandingsScreen() {
                   <Text style={[s.cell, { flex: 0.7 }, isFav && { color: tc.primary }]}>{t.draw}</Text>
                   <Text style={[s.cell, { flex: 1.0 }, isFav && { color: tc.primary }]}>{typeof t.rate === 'number' ? t.rate.toFixed(3) : t.rate}</Text>
                   <Text style={[s.cell, { flex: 0.8 }, isFav && { color: tc.primary }]}>{t.gb ?? '-'}</Text>
+                  <Text style={[s.cell, { flex: 0.9 }, t.streak?.includes('승') ? s.winStreak : t.streak?.includes('패') ? s.loseStreak : null]}>{t.streak ?? '-'}</Text>
                 </View>
               );
             })}
