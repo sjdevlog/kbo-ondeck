@@ -12,17 +12,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export type CancelReason = '우천' | '강풍' | '폭염' | '미세먼지' | '황사';
-
-export type Game = {
-  away: string;
-  home: string;
-  time: string;
-  stadium: string;
-  broadcast: string;
-  cancelled?: CancelReason;
-  doubleheader?: 1 | 2;
-};
+import type { Game, CancelReason } from '@/types/game';
+export type { Game, CancelReason };
 
 const CANCEL_BADGE: Record<CancelReason, { icon: string; label: string; bg: string; color: string }> = {
   우천:    { icon: '🌧',  label: '우천취소',    bg: '#dbeafe', color: '#1d4ed8' },

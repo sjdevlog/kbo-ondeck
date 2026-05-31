@@ -1,4 +1,4 @@
-import type { Game } from '@/app/(tabs)/games';
+import type { Game } from '@/types/game';
 
 // 개발: localhost, 배포 후 실서버 주소로 교체
 const BASE_URL = 'http://localhost:3000';
