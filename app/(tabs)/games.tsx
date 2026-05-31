@@ -10,13 +10,23 @@ import { useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+export type CancelReason = '우천' | '강풍' | '폭염' | '미세먼지' | '황사';
+
 export type Game = {
   away: string;
   home: string;
   time: string;
   stadium: string;
   broadcast: string;
-  cancelled?: boolean;
+  cancelled?: CancelReason;
+};
+
+const CANCEL_BADGE: Record<CancelReason, { icon: string; label: string; bg: string; color: string }> = {
+  우천:    { icon: '🌧',  label: '우천취소',    bg: '#dbeafe', color: '#1d4ed8' },
+  강풍:    { icon: '💨',  label: '강풍취소',    bg: '#f3e8ff', color: '#7c3aed' },
+  폭염:    { icon: '🌡️', label: '폭염취소',    bg: '#fff7ed', color: '#c2410c' },
+  미세먼지: { icon: '😷', label: '미세먼지취소', bg: '#fef9c3', color: '#854d0e' },
+  황사:    { icon: '🌫️', label: '황사취소',    bg: '#fef3c7', color: '#92400e' },
 };
 
 // ---------- 날짜 헬퍼 ----------
@@ -44,17 +54,17 @@ function getWeekDates() {
 const WEEKDAY_GAMES: Game[] = [
   { away: 'KIA 타이거즈',  home: 'LG 트윈스',     time: '18:30', stadium: '잠실',                  broadcast: 'KBS N 스포츠' },
   { away: '두산 베어스',   home: 'SSG 랜더스',    time: '18:30', stadium: '인천SSG랜더스필드',     broadcast: '스포티비' },
-  { away: '삼성 라이온즈', home: 'NC 다이노스',   time: '18:30', stadium: '창원NC파크',            broadcast: 'MBC스포츠+', cancelled: true },
-  { away: '한화 이글스',  home: '롯데 자이언츠',  time: '18:30', stadium: '사직',                  broadcast: '스포티비2' },
+  { away: '삼성 라이온즈', home: 'NC 다이노스',   time: '18:30', stadium: '창원NC파크',            broadcast: 'MBC스포츠+', cancelled: '우천' },
+  { away: '한화 이글스',  home: '롯데 자이언츠',  time: '18:30', stadium: '사직',                  broadcast: '스포티비2', cancelled: '미세먼지' },
   { away: '키움 히어로즈', home: 'KT 위즈',       time: '18:30', stadium: '수원KT위즈파크',        broadcast: 'TVING' },
 ];
 
 const WEEKEND_GAMES: Game[] = [
   { away: '두산 베어스',   home: 'KIA 타이거즈',  time: '14:00', stadium: '광주기아챔피언스필드',  broadcast: 'KBS N 스포츠' },
-  { away: 'SSG 랜더스',   home: 'LG 트윈스',     time: '14:00', stadium: '잠실',                  broadcast: '스포티비' },
+  { away: 'SSG 랜더스',   home: 'LG 트윈스',     time: '14:00', stadium: '잠실',                  broadcast: '스포티비', cancelled: '강풍' },
   { away: 'NC 다이노스',  home: '삼성 라이온즈',  time: '14:00', stadium: '대구삼성라이온즈파크',  broadcast: 'MBC스포츠+' },
-  { away: '롯데 자이언츠', home: '한화 이글스',   time: '14:00', stadium: '대전한화생명볼파크',    broadcast: '스포티비2' },
-  { away: 'KT 위즈',      home: '키움 히어로즈',  time: '14:00', stadium: '고척스카이돔',          broadcast: 'TVING' },
+  { away: '롯데 자이언츠', home: '한화 이글스',   time: '14:00', stadium: '대전한화생명볼파크',    broadcast: '스포티비2', cancelled: '폭염' },
+  { away: 'KT 위즈',      home: '키움 히어로즈',  time: '14:00', stadium: '고척스카이돔',          broadcast: 'TVING', cancelled: '황사' },
 ];
 
 function gamesForDow(dow: number): Game[] {
@@ -188,9 +198,11 @@ export default function GamesScreen() {
                     <Text style={[s.gameTime, g.cancelled && s.fadedText]}>{g.time}</Text>
                     <Text style={s.gameStadium}>{g.stadium}</Text>
                     {g.cancelled ? (
-                      <View style={s.cancelledRow}>
-                        <Text style={s.cancelledIcon}>🌧</Text>
-                        <Text style={s.cancelledText}>우천취소</Text>
+                      <View style={[s.cancelledRow, { backgroundColor: CANCEL_BADGE[g.cancelled].bg }]}>
+                        <Text style={s.cancelledIcon}>{CANCEL_BADGE[g.cancelled].icon}</Text>
+                        <Text style={[s.cancelledText, { color: CANCEL_BADGE[g.cancelled].color }]}>
+                          {CANCEL_BADGE[g.cancelled].label}
+                        </Text>
                       </View>
                     ) : weather ? (
                       <View style={s.weatherRow}>
