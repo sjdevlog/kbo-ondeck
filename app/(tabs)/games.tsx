@@ -16,6 +16,7 @@ export type Game = {
   time: string;
   stadium: string;
   broadcast: string;
+  cancelled?: boolean;
 };
 
 // ---------- 날짜 헬퍼 ----------
@@ -43,7 +44,7 @@ function getWeekDates() {
 const WEEKDAY_GAMES: Game[] = [
   { away: 'KIA 타이거즈',  home: 'LG 트윈스',     time: '18:30', stadium: '잠실',                  broadcast: 'KBS N 스포츠' },
   { away: '두산 베어스',   home: 'SSG 랜더스',    time: '18:30', stadium: '인천SSG랜더스필드',     broadcast: '스포티비' },
-  { away: '삼성 라이온즈', home: 'NC 다이노스',   time: '18:30', stadium: '창원NC파크',            broadcast: 'MBC스포츠+' },
+  { away: '삼성 라이온즈', home: 'NC 다이노스',   time: '18:30', stadium: '창원NC파크',            broadcast: 'MBC스포츠+', cancelled: true },
   { away: '한화 이글스',  home: '롯데 자이언츠',  time: '18:30', stadium: '사직',                  broadcast: '스포티비2' },
   { away: '키움 히어로즈', home: 'KT 위즈',       time: '18:30', stadium: '수원KT위즈파크',        broadcast: 'TVING' },
 ];
@@ -174,19 +175,25 @@ export default function GamesScreen() {
             const weather = getWeather(g.stadium, selectedDate.iso);
 
             return (
-              <View key={i} style={s.gameCard}>
-                <View style={s.teamsRow}>
+              <View key={i} style={[s.gameCard, g.cancelled && s.gameCardCancelled]}>
+                {g.cancelled && (
+                  <View style={s.cancelledBanner}>
+                    <Text style={s.cancelledIcon}>🌧</Text>
+                    <Text style={s.cancelledText}>우천취소</Text>
+                  </View>
+                )}
+                <View style={[s.teamsRow, g.cancelled && s.teamsRowCancelled]}>
                   <View style={s.teamBlock}>
-                    <View style={[s.teamBadge, { backgroundColor: awayBg, borderColor: ac?.primary }]}>
+                    <View style={[s.teamBadge, { backgroundColor: awayBg, borderColor: ac?.primary }, g.cancelled && s.badgeCancelled]}>
                       <AwayLogo width={38} height={38} />
                     </View>
-                    <Text style={s.teamName}>{g.away}</Text>
+                    <Text style={[s.teamName, g.cancelled && s.textCancelled]}>{g.away}</Text>
                   </View>
 
                   <View style={s.gameCenter}>
-                    <Text style={s.gameTime}>{g.time}</Text>
+                    <Text style={[s.gameTime, g.cancelled && s.textCancelled]}>{g.time}</Text>
                     <Text style={s.gameStadium}>{g.stadium}</Text>
-                    {weather && (
+                    {!g.cancelled && weather && (
                       <View style={s.weatherRow}>
                         <Text style={s.weatherIcon}>{weather.icon}</Text>
                         <Text style={[s.weatherTemp, { color: colors.textMuted }]}>
@@ -197,19 +204,21 @@ export default function GamesScreen() {
                   </View>
 
                   <View style={s.teamBlock}>
-                    <View style={[s.teamBadge, { backgroundColor: homeBg, borderColor: hc?.primary }]}>
+                    <View style={[s.teamBadge, { backgroundColor: homeBg, borderColor: hc?.primary }, g.cancelled && s.badgeCancelled]}>
                       <HomeLogo width={38} height={38} />
                     </View>
-                    <Text style={s.teamName}>{g.home}</Text>
+                    <Text style={[s.teamName, g.cancelled && s.textCancelled]}>{g.home}</Text>
                   </View>
                 </View>
 
-                <View style={s.cardFooter}>
-                  <Text style={s.broadcastText}>{g.broadcast}</Text>
-                  <TouchableOpacity style={[s.previewBtn, { backgroundColor: colors.accent }]}>
-                    <Text style={s.previewText}>프리뷰</Text>
-                  </TouchableOpacity>
-                </View>
+                {!g.cancelled && (
+                  <View style={s.cardFooter}>
+                    <Text style={s.broadcastText}>{g.broadcast}</Text>
+                    <TouchableOpacity style={[s.previewBtn, { backgroundColor: colors.accent }]}>
+                      <Text style={s.previewText}>프리뷰</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             );
           })
@@ -237,8 +246,15 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors']) => StyleSheet.c
   errorBanner:      { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 16, marginBottom: 8, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1 },
   errorText:        { fontSize: 12 },
   gameList:         { paddingHorizontal: 16, gap: 12, paddingBottom: 24 },
-  gameCard:         { backgroundColor: c.card, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: c.border },
-  teamsRow:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+  gameCard:            { backgroundColor: c.card, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: c.border },
+  gameCardCancelled:   { opacity: 0.6 },
+  cancelledBanner:     { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#e0f2fe', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, marginBottom: 12 },
+  cancelledIcon:       { fontSize: 14 },
+  cancelledText:       { fontSize: 13, fontWeight: '600', color: '#0369a1' },
+  teamsRow:            { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+  teamsRowCancelled:   { marginBottom: 0 },
+  badgeCancelled:      { opacity: 0.4 },
+  textCancelled:       { textDecorationLine: 'line-through', color: c.textMuted },
   teamBlock:        { alignItems: 'center', flex: 1 },
   teamBadge:        { width: 52, height: 52, borderRadius: 26, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   teamName:         { fontSize: 11, color: c.textMuted, textAlign: 'center' },
