@@ -136,37 +136,35 @@ export default function StandingsScreen() {
 
       {mainTab === '순위' ? (
         // ── 순위 테이블 ──────────────────────────────────────
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View>
-            <View style={s.headerRow}>
-              {['순위','팀','경기','승','패','무','승률','GB'].map((h, i) => (
-                <Text key={h} style={[s.headerCell, { width: [36,90,40,32,32,32,56,44][i] }]}>{h}</Text>
-              ))}
-            </View>
-            <ScrollView>
-              {standings.map((t: any, i: number) => {
-                const isFav = favoriteTeam === t.name;
-                const tc = TEAM_COLORS[t.name];
-                const Logo = TEAM_LOGOS[t.name];
-                return (
-                  <View key={t.name} style={[s.row, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
-                    <Text style={[s.cell, { width: 36 },  isFav && { color: tc.primary, fontWeight: 'bold' }]}>{t.rank}</Text>
-                    <View style={[s.nameCell, { width: 90 }]}>
-                      <Logo width={24} height={24} />
-                      <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{tc.short}</Text>
-                    </View>
-                    <Text style={[s.cell, { width: 40 }, isFav && { color: tc.primary }]}>{t.games}</Text>
-                    <Text style={[s.cell, s.win,  { width: 32 }]}>{t.win}</Text>
-                    <Text style={[s.cell, s.lose, { width: 32 }]}>{t.lose}</Text>
-                    <Text style={[s.cell, { width: 32 }, isFav && { color: tc.primary }]}>{t.draw}</Text>
-                    <Text style={[s.cell, { width: 56 }, isFav && { color: tc.primary }]}>{typeof t.rate === 'number' ? t.rate.toFixed(3) : t.rate}</Text>
-                    <Text style={[s.cell, { width: 44 }, isFav && { color: tc.primary }]}>{t.gb ?? '-'}</Text>
-                  </View>
-                );
-              })}
-            </ScrollView>
+        <View style={{ flex: 1 }}>
+          <View style={[s.headerRow, { paddingHorizontal: 0 }]}>
+            {[{h:'순위',f:0.6},{h:'팀',f:1.8},{h:'경기',f:0.8},{h:'승',f:0.7},{h:'패',f:0.7},{h:'무',f:0.7},{h:'승률',f:1.0},{h:'GB',f:0.8}].map(({h,f}) => (
+              <Text key={h} style={[s.headerCell, { flex: f }]}>{h}</Text>
+            ))}
           </View>
-        </ScrollView>
+          <ScrollView>
+            {standings.map((t: any, i: number) => {
+              const isFav = favoriteTeam === t.name;
+              const tc = TEAM_COLORS[t.name];
+              const Logo = TEAM_LOGOS[t.name];
+              return (
+                <View key={t.name} style={[s.row, { paddingHorizontal: 0 }, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
+                  <Text style={[s.cell, { flex: 0.6 }, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{t.rank}</Text>
+                  <View style={[s.nameCell, { flex: 1.8 }]}>
+                    <Logo width={22} height={22} />
+                    <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{tc?.short}</Text>
+                  </View>
+                  <Text style={[s.cell, { flex: 0.8 }, isFav && { color: tc.primary }]}>{t.games}</Text>
+                  <Text style={[s.cell, s.win,  { flex: 0.7 }]}>{t.win}</Text>
+                  <Text style={[s.cell, s.lose, { flex: 0.7 }]}>{t.lose}</Text>
+                  <Text style={[s.cell, { flex: 0.7 }, isFav && { color: tc.primary }]}>{t.draw}</Text>
+                  <Text style={[s.cell, { flex: 1.0 }, isFav && { color: tc.primary }]}>{typeof t.rate === 'number' ? t.rate.toFixed(3) : t.rate}</Text>
+                  <Text style={[s.cell, { flex: 0.8 }, isFav && { color: tc.primary }]}>{t.gb ?? '-'}</Text>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
       ) : (
         // ── 팀 기록 ──────────────────────────────────────────
         <View style={{ flex: 1 }}>
