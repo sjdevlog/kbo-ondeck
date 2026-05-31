@@ -150,7 +150,7 @@ export default function StandingsScreen() {
               return (
                 <View key={t.name} style={[s.row, { paddingHorizontal: 0 }, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
                   <Text style={[s.cell, { flex: 0.6 }, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{t.rank}</Text>
-                  <View style={[s.nameCell, { flex: 1.8 }]}>
+                  <View style={[s.nameCell, { flex: 1.8, justifyContent: 'center' }]}>
                     <Logo width={22} height={22} />
                     <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{tc?.short}</Text>
                   </View>
