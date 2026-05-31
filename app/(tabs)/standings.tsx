@@ -86,9 +86,9 @@ export default function StandingsScreen() {
   const [mainTab, setMainTab] = useState<MainTab>('순위');
   const [statTab, setStatTab] = useState<StatTab>('타격');
 
-  const [standings, setStandings] = useState(STANDINGS);
-  const [batting, setBatting] = useState(TEAM_BATTING);
-  const [pitching, setPitching] = useState(TEAM_PITCHING);
+  const [standings, setStandings] = useState<any[]>(STANDINGS);
+  const [batting, setBatting] = useState<any[]>([]);
+  const [pitching, setPitching] = useState<any[]>([]);
 
   useEffect(() => {
     api.standings().then((d) => setStandings(d as typeof STANDINGS)).catch(() => {});
