@@ -180,7 +180,7 @@ export default function StandingsScreen() {
             <View>
               {/* 헤더 */}
               <View style={s.headerRow}>
-                <Text style={[s.headerCell, { width: 110 }]}>팀</Text>
+                <Text style={[s.headerCell, { width: 90 }]}>팀</Text>
                 {(statTab === '타격' ? BATTING_COLS : PITCHING_COLS).map(col => (
                   <TouchableOpacity key={col.key} onPress={() => setSortKey(col.key)} style={{ width: col.width }}>
                     <Text style={[s.headerCell, { width: col.width }, sortKey === col.key && s.headerCellActive]}>
@@ -201,10 +201,10 @@ export default function StandingsScreen() {
                   const cols = statTab === '타격' ? BATTING_COLS : PITCHING_COLS;
                   return (
                     <View key={name} style={[s.row, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
-                      <View style={[s.nameCell, { width: 110 }]}>
+                      <View style={[s.nameCell, { width: 90 }]}>
                         <Text style={[s.rankNum, { color: tc.primary }]}>{i + 1}</Text>
                         <Logo width={22} height={22} />
-                        <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]} numberOfLines={1}>{name}</Text>
+                        <Text style={[s.nameText, isFav && { color: tc.primary, fontWeight: 'bold' }]}>{tc.short}</Text>
                       </View>
                       {cols.map(col => {
                         const val = statTab === '타격' ? (bStats as any)[col.key] : (pStats as any)[col.key];
