@@ -129,7 +129,15 @@ export default function GamesScreen() {
   const { favoriteTeam } = useFavoriteTeam();
   const s = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
 
-  const allGames: Game[] = SCHEDULE[selectedDate.display] ?? [];
+  const allGames: Game[] = useMemo(() => {
+    const list = SCHEDULE[selectedDate.display] ?? [];
+    if (!favoriteTeam) return list;
+    return [...list].sort((a, b) => {
+      const aFav = a.away === favoriteTeam || a.home === favoriteTeam;
+      const bFav = b.away === favoriteTeam || b.home === favoriteTeam;
+      return aFav === bFav ? 0 : aFav ? -1 : 1;
+    });
+  }, [selectedDate, favoriteTeam]);
   const games = myTeamOnly && favoriteTeam
     ? allGames.filter((g) => g.away === favoriteTeam || g.home === favoriteTeam)
     : allGames;
