@@ -157,12 +157,6 @@ export default function GamesScreen() {
               actionLabel="전체 경기 보기"
               onAction={() => setMyTeamOnly(false)}
             />
-          ) : selectedDate.dayName === '월' ? (
-            <EmptyState
-              icon="🏟️"
-              message="KBO 정기 휴식일"
-              sub="월요일은 KBO 리그 휴식일이에요"
-            />
           ) : (
             <EmptyState
               icon="⚾"
