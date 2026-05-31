@@ -6,6 +6,20 @@ const HEADERS = {
   Referer: 'https://statiz.co.kr',
 };
 
+// 연속 기록 (순위 순서대로 수동 업데이트)
+const STREAK_BY_RANK: Record<number, string> = {
+  1: '3연승',
+  2: '4연승',
+  3: '1연승',
+  4: '3연패',
+  5: '4연승',
+  6: '1연패',
+  7: '2연승',
+  8: '12연패',
+  9: '2연패',
+  10: '8연패',
+};
+
 // statiz 단축팀명 → KBO 풀네임 매핑
 const TEAM_NAME_MAP: Record<string, string> = {
   'LG':   'LG 트윈스',
@@ -34,8 +48,9 @@ export async function scrapeStandings() {
     const fullName = TEAM_NAME_MAP[shortName] ?? shortName;
     const gb = $(tds[6]).text().trim();
 
+    const rank = parseInt($(tds[0]).text().trim()) || 0;
     rows.push({
-      rank:   parseInt($(tds[0]).text().trim()) || 0,
+      rank,
       name:   fullName,
       games:  parseInt($(tds[2]).text().trim()) || 0,
       win:    parseInt($(tds[3]).text().trim()) || 0,
@@ -44,6 +59,7 @@ export async function scrapeStandings() {
       gb:     gb === '0.0' ? null : parseFloat(gb) || null,
       rate:   parseFloat($(tds[7]).text().trim()) || 0,
       r:      parseInt($(tds[8]).text().trim()) || 0,
+      streak: STREAK_BY_RANK[rank] ?? '-',
     });
   });
 
