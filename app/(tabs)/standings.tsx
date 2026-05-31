@@ -139,15 +139,14 @@ export default function StandingsScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View>
             <View style={s.headerRow}>
-              {['순위','팀','경기','승','패','무','승률','GB','최근10G','연속'].map((h, i) => (
-                <Text key={h} style={[s.headerCell, { width: [36,90,40,32,32,32,56,44,80,60][i] }]}>{h}</Text>
+              {['순위','팀','경기','승','패','무','승률','GB'].map((h, i) => (
+                <Text key={h} style={[s.headerCell, { width: [36,90,40,32,32,32,56,44][i] }]}>{h}</Text>
               ))}
             </View>
             <ScrollView>
               {standings.map((t: any, i: number) => {
                 const isFav = favoriteTeam === t.name;
                 const tc = TEAM_COLORS[t.name];
-                const isWin = t.streak.includes('승');
                 const Logo = TEAM_LOGOS[t.name];
                 return (
                   <View key={t.name} style={[s.row, i % 2 === 1 && s.rowAlt, isFav && { backgroundColor: isDark ? tc.background : tc.lightBg, borderLeftWidth: 3, borderLeftColor: tc.primary }]}>
@@ -160,10 +159,8 @@ export default function StandingsScreen() {
                     <Text style={[s.cell, s.win,  { width: 32 }]}>{t.win}</Text>
                     <Text style={[s.cell, s.lose, { width: 32 }]}>{t.lose}</Text>
                     <Text style={[s.cell, { width: 32 }, isFav && { color: tc.primary }]}>{t.draw}</Text>
-                    <Text style={[s.cell, { width: 56 }, isFav && { color: tc.primary }]}>{t.rate}</Text>
-                    <Text style={[s.cell, { width: 44 }, isFav && { color: tc.primary }]}>{t.diff}</Text>
-                    <Text style={[s.cell, { width: 80 }, isFav && { color: tc.primary }]}>{t.last10}</Text>
-                    <Text style={[s.cell, { width: 60 }, isWin ? s.winStreak : s.loseStreak]}>{t.streak}</Text>
+                    <Text style={[s.cell, { width: 56 }, isFav && { color: tc.primary }]}>{typeof t.rate === 'number' ? t.rate.toFixed(3) : t.rate}</Text>
+                    <Text style={[s.cell, { width: 44 }, isFav && { color: tc.primary }]}>{t.gb ?? '-'}</Text>
                   </View>
                 );
               })}
