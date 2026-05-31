@@ -1,4 +1,5 @@
 import { EmptyState } from '@/components/ui/EmptyState';
+import PreviewModal from '@/components/ui/PreviewModal';
 import { GameCardSkeleton } from '@/components/ui/SkeletonBox';
 import { TEAM_COLORS } from '@/constants/teamColors';
 import { TEAM_LOGOS } from '@/constants/teamLogos';
@@ -122,6 +123,7 @@ export default function GamesScreen() {
   const WEEK = useMemo(() => getWeekDates(), []);
   const [selectedDate, setSelectedDate] = useState(WEEK[0]);
   const [myTeamOnly, setMyTeamOnly] = useState(false);
+  const [previewGame, setPreviewGame] = useState<Game | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const { colors, isDark } = useAppTheme();
   const { favoriteTeam } = useFavoriteTeam();
@@ -268,7 +270,10 @@ export default function GamesScreen() {
                 {!g.cancelled && (
                   <View style={s.cardFooter}>
                     <Text style={s.broadcastText}>{g.broadcast}</Text>
-                    <TouchableOpacity style={[s.previewBtn, { backgroundColor: colors.accent }]}>
+                    <TouchableOpacity
+                      style={[s.previewBtn, { backgroundColor: colors.accent }]}
+                      onPress={() => setPreviewGame(g)}
+                    >
                       <Text style={s.previewText}>프리뷰</Text>
                     </TouchableOpacity>
                   </View>
@@ -278,6 +283,11 @@ export default function GamesScreen() {
           })
         )}
       </ScrollView>
+      <PreviewModal
+        game={previewGame}
+        weather={previewGame ? getWeather(previewGame.stadium, selectedDate.iso) : null}
+        onClose={() => setPreviewGame(null)}
+      />
     </SafeAreaView>
   );
 }
