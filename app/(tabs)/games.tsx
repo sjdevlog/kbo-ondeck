@@ -1,3 +1,4 @@
+import CalendarModal from '@/components/ui/CalendarModal';
 import { EmptyState } from '@/components/ui/EmptyState';
 import PreviewModal from '@/components/ui/PreviewModal';
 import { GameCardSkeleton } from '@/components/ui/SkeletonBox';
@@ -26,27 +27,36 @@ const CANCEL_BADGE: Record<CancelReason, { icon: string; label: string; bg: stri
 // ---------- 날짜 헬퍼 ----------
 const KR_DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-function getWeekDates() {
-  const today = new Date();
+function makeWeekDates(centerIso: string) {
+  const center = new Date(centerIso + 'T00:00:00');
+  const todayIso = new Date().toISOString().split('T')[0];
   return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
+    const d = new Date(center);
+    d.setDate(center.getDate() - 3 + i); // 선택 날짜 기준 ±3일
     const m = d.getMonth() + 1;
     const day = d.getDate();
+    const iso = d.toISOString().split('T')[0];
     return {
       display: `${m}/${day}`,
-      iso: d.toISOString().split('T')[0],
+      iso,
       dayName: KR_DAYS[d.getDay()],
-      isToday: i === 0,
+      isToday: iso === todayIso,
     };
   });
 }
 
+function getTodayIso() {
+  return new Date().toISOString().split('T')[0];
+}
+
 // ---------- 컴포넌트 ----------
 export default function GamesScreen() {
-  const WEEK = useMemo(() => getWeekDates(), []);
-  const [selectedDate, setSelectedDate] = useState(WEEK[0]);
+  const todayIso = getTodayIso();
+  const [centerIso, setCenterIso] = useState(todayIso);
+  const WEEK = useMemo(() => makeWeekDates(centerIso), [centerIso]);
+  const [selectedDate, setSelectedDate] = useState(() => WEEK[3]); // 가운데(선택일) 기본
   const [previewGame, setPreviewGame] = useState<Game | null>(null);
+  const [calendarVisible, setCalendarVisible] = useState(false);
   const { colors, isDark } = useAppTheme();
   const { favoriteTeam } = useFavoriteTeam();
   const s = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
@@ -88,6 +98,9 @@ export default function GamesScreen() {
     <SafeAreaView style={s.container}>
       <View style={s.header}>
         <Text style={s.title}>오늘의 경기</Text>
+        <TouchableOpacity onPress={() => setCalendarVisible(true)} style={s.calendarBtn}>
+          <Ionicons name="calendar-outline" size={22} color={colors.accent} />
+        </TouchableOpacity>
       </View>
 
       {/* 날짜 슬라이더 */}
@@ -202,6 +215,23 @@ export default function GamesScreen() {
         weather={previewGame ? getWeather(previewGame.stadium) : null}
         onClose={() => setPreviewGame(null)}
       />
+      <CalendarModal
+        visible={calendarVisible}
+        selectedIso={selectedDate.iso}
+        onSelect={(iso) => {
+          setCenterIso(iso);
+          const d = new Date(iso + 'T00:00:00');
+          const m = d.getMonth() + 1;
+          const day = d.getDate();
+          setSelectedDate({
+            iso,
+            display: `${m}/${day}`,
+            dayName: ['일','월','화','수','목','금','토'][d.getDay()],
+            isToday: iso === todayIso,
+          });
+        }}
+        onClose={() => setCalendarVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -210,6 +240,7 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors'], isDark: boolean
   container:        { flex: 1, backgroundColor: c.bg },
   header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
   title:            { fontSize: 20, fontWeight: 'bold', color: c.text },
+  calendarBtn:      { padding: 6 },
   dateSliderWrap:   { backgroundColor: c.card, borderBottomWidth: 1, borderBottomColor: c.border },
   dateSlider:       { flexDirection: 'row', paddingHorizontal: 8, paddingVertical: 10, gap: 4 },
   dateItem:         { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: c.card },
