@@ -18,85 +18,93 @@ const STADIUM_COORDS: Record<string, { lat: number; lon: number }> = {
   '대전한화생명볼파크':  { lat: 36.3175, lon: 127.4297 },
   '수원KT위즈파크':     { lat: 37.2997, lon: 127.0097 },
   '고척스카이돔':       { lat: 37.4983, lon: 126.8676 },
+  // statiz 단축 구장명 추가
+  '잠실':   { lat: 37.5122, lon: 127.0719 },
+  '문학':   { lat: 37.4370, lon: 126.6930 },
+  '수원':   { lat: 37.2997, lon: 127.0097 },
+  '대구':   { lat: 35.8412, lon: 128.6814 },
+  '광주':   { lat: 35.1681, lon: 126.8892 },
+  '사직':   { lat: 35.1941, lon: 129.0613 },
+  '대전':   { lat: 36.3175, lon: 127.4297 },
+  '창원':   { lat: 35.2226, lon: 128.5822 },
+  '고척':   { lat: 37.4983, lon: 126.8676 },
 };
 
 function codeToWeather(code: number): { icon: string; label: string } {
-  if (code === 0)           return { icon: '☀️',  label: '맑음'   };
-  if (code <= 3)            return { icon: '⛅',  label: '구름'   };
-  if (code <= 48)           return { icon: '🌫️', label: '안개'   };
-  if (code <= 55)           return { icon: '🌦️', label: '이슬비' };
-  if (code <= 65)           return { icon: '🌧️', label: '비'     };
-  if (code <= 75)           return { icon: '❄️',  label: '눈'     };
-  if (code <= 82)           return { icon: '🌩️', label: '소나기' };
-  return                           { icon: '⛈️',  label: '뇌우'   };
+  if (code === 0)  return { icon: '☀️',  label: '맑음'   };
+  if (code <= 3)   return { icon: '⛅',  label: '구름'   };
+  if (code <= 48)  return { icon: '🌫️', label: '안개'   };
+  if (code <= 55)  return { icon: '🌦️', label: '이슬비' };
+  if (code <= 65)  return { icon: '🌧️', label: '비'     };
+  if (code <= 75)  return { icon: '❄️',  label: '눈'     };
+  if (code <= 82)  return { icon: '🌩️', label: '소나기' };
+  return                  { icon: '⛈️',  label: '뇌우'   };
 }
 
-// module-level cache: stadium -> { iso-date -> WeatherInfo }
-const cache: Record<string, Record<string, WeatherInfo>> = {};
+// 캐시: `stadium:isoDate` → WeatherInfo
+const cache: Record<string, WeatherInfo> = {};
 
-async function fetchWeeklyWeather(stadium: string): Promise<Record<string, WeatherInfo>> {
-  if (cache[stadium]) return cache[stadium];
+async function fetchDayWeather(stadium: string, isoDate: string): Promise<WeatherInfo | null> {
+  const key = `${stadium}:${isoDate}`;
+  if (cache[key]) return cache[key];
 
   const coords = STADIUM_COORDS[stadium];
-  if (!coords) return {};
+  if (!coords) return null;
 
   const url =
     `https://api.open-meteo.com/v1/forecast` +
     `?latitude=${coords.lat}&longitude=${coords.lon}` +
     `&daily=weather_code,temperature_2m_max,temperature_2m_min` +
-    `&timezone=Asia%2FSeoul&forecast_days=7`;
+    `&timezone=Asia%2FSeoul&start_date=${isoDate}&end_date=${isoDate}`;
 
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) return null;
 
   const data = await res.json();
-  const result: Record<string, WeatherInfo> = {};
+  if (!data.daily?.time?.length) return null;
 
-  (data.daily.time as string[]).forEach((isoDate, i) => {
-    const code = data.daily.weather_code[i] as number;
-    result[isoDate] = {
-      tempMax: Math.round(data.daily.temperature_2m_max[i]),
-      tempMin: Math.round(data.daily.temperature_2m_min[i]),
-      code,
-      ...codeToWeather(code),
-    };
-  });
-
-  cache[stadium] = result;
-  return result;
+  const code = data.daily.weather_code[0] as number;
+  const info: WeatherInfo = {
+    tempMax: Math.round(data.daily.temperature_2m_max[0]),
+    tempMin: Math.round(data.daily.temperature_2m_min[0]),
+    code,
+    ...codeToWeather(code),
+  };
+  cache[key] = info;
+  return info;
 }
 
-type WeatherState = {
-  map: Record<string, Record<string, WeatherInfo>>;
-  loading: boolean;
-  error: string | null;
-};
-
-export function useStadiumWeather(stadiums: string[]) {
-  const key = [...new Set(stadiums)].sort().join(',');
+export function useStadiumWeather(stadiums: string[], isoDate: string) {
+  const key = [...new Set(stadiums)].sort().join(',') + ':' + isoDate;
   const prevKey = useRef('');
 
-  const [state, setState] = useState<WeatherState>({ map: {}, loading: true, error: null });
+  const [map, setMap] = useState<Record<string, WeatherInfo>>({});
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!key || key === prevKey.current) return;
+    if (!isoDate || !stadiums.length || key === prevKey.current) return;
     prevKey.current = key;
 
     const unique = [...new Set(stadiums)].filter((s) => STADIUM_COORDS[s]);
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    if (!unique.length) { setWeatherLoading(false); return; }
 
-    Promise.all(unique.map((s) => fetchWeeklyWeather(s).then((d) => [s, d] as const)))
+    setWeatherLoading(true);
+    Promise.all(unique.map((s) => fetchDayWeather(s, isoDate).then((d) => [s, d] as const)))
       .then((entries) => {
-        setState({ map: Object.fromEntries(entries), loading: false, error: null });
+        const result: Record<string, WeatherInfo> = {};
+        entries.forEach(([s, d]) => { if (d) result[s] = d; });
+        setMap(result);
+        setWeatherLoading(false);
       })
       .catch(() => {
-        setState((prev) => ({ ...prev, loading: false, error: '날씨 정보를 불러올 수 없어요' }));
+        setWeatherLoading(false);
+        setWeatherError('날씨 정보를 불러올 수 없어요');
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  const getWeather = (stadium: string, isoDate: string): WeatherInfo | null =>
-    state.map[stadium]?.[isoDate] ?? null;
+  const getWeather = (stadium: string): WeatherInfo | null => map[stadium] ?? null;
 
-  return { getWeather, weatherLoading: state.loading, weatherError: state.error };
+  return { getWeather, weatherLoading, weatherError };
 }

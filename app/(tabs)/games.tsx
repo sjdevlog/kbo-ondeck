@@ -83,7 +83,7 @@ export default function GamesScreen() {
     () => fetchedGames.map((g) => g.stadium),
     [fetchedGames]
   );
-  const { getWeather, weatherLoading, weatherError } = useStadiumWeather(stadiums);
+  const { getWeather, weatherLoading, weatherError } = useStadiumWeather(stadiums, selectedDate.iso);
 
   return (
     <SafeAreaView style={s.container}>
@@ -139,7 +139,7 @@ export default function GamesScreen() {
             const homeBg = isDark ? hc?.background : hc?.lightBg;
             const AwayLogo = TEAM_LOGOS[g.away];
             const HomeLogo = TEAM_LOGOS[g.home];
-            const weather = getWeather(g.stadium, selectedDate.iso);
+            const weather = getWeather(g.stadium);
 
             return (
               <View key={i} style={[s.gameCard, g.cancelled && s.gameCardCancelled]}>
@@ -200,7 +200,7 @@ export default function GamesScreen() {
       </ScrollView>
       <PreviewModal
         game={previewGame}
-        weather={previewGame ? getWeather(previewGame.stadium, selectedDate.iso) : null}
+        weather={previewGame ? getWeather(previewGame.stadium) : null}
         onClose={() => setPreviewGame(null)}
       />
     </SafeAreaView>
