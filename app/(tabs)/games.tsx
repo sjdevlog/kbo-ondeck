@@ -8,7 +8,7 @@ import { useAppTheme } from '@/context/ThemeContext';
 import { useStadiumWeather } from '@/hooks/useStadiumWeather';
 import { Ionicons } from '@expo/vector-icons';
 import { api } from '@/services/api';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -47,7 +47,6 @@ export default function GamesScreen() {
   const WEEK = useMemo(() => getWeekDates(), []);
   const [selectedDate, setSelectedDate] = useState(WEEK[0]);
   const [previewGame, setPreviewGame] = useState<Game | null>(null);
-  const scrollRef = useRef<ScrollView>(null);
   const { colors, isDark } = useAppTheme();
   const { favoriteTeam } = useFavoriteTeam();
   const s = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
@@ -93,22 +92,22 @@ export default function GamesScreen() {
 
       {/* 날짜 슬라이더 */}
       <View style={s.dateSliderWrap}>
-      <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.dateSlider}>
-        {WEEK.map((item) => {
-          const isSelected = selectedDate.iso === item.iso;
-          return (
-            <TouchableOpacity
-              key={item.iso}
-              style={[s.dateItem, isSelected && { backgroundColor: colors.accent }]}
-              onPress={() => setSelectedDate(item)}
-            >
-              <Text style={[s.dayName, isSelected && { color: 'rgba(255,255,255,0.8)' }]}>{item.dayName}</Text>
-              <Text style={[s.dateNum, isSelected && { color: '#fff' }]}>{item.display.split('/')[1]}</Text>
-              {item.isToday && !isSelected && <View style={s.todayDot} />}
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+        <View style={s.dateSlider}>
+          {WEEK.map((item) => {
+            const isSelected = selectedDate.iso === item.iso;
+            return (
+              <TouchableOpacity
+                key={item.iso}
+                style={[s.dateItem, isSelected && { backgroundColor: colors.accent }]}
+                onPress={() => setSelectedDate(item)}
+              >
+                <Text style={[s.dayName, isSelected && { color: 'rgba(255,255,255,0.8)' }]}>{item.dayName}</Text>
+                <Text style={[s.dateNum, isSelected && { color: '#fff' }]}>{item.display.split('/')[1]}</Text>
+                {item.isToday && !isSelected && <View style={s.todayDot} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
 
       {/* 날씨 에러 배너 */}
@@ -212,8 +211,8 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors'], isDark: boolean
   header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
   title:            { fontSize: 20, fontWeight: 'bold', color: c.text },
   dateSliderWrap:   { backgroundColor: c.card, borderBottomWidth: 1, borderBottomColor: c.border },
-  dateSlider:       { paddingHorizontal: 12, gap: 6, paddingVertical: 10 },
-  dateItem:         { alignItems: 'center', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12, backgroundColor: c.card, minWidth: 52 },
+  dateSlider:       { flexDirection: 'row', paddingHorizontal: 8, paddingVertical: 10, gap: 4 },
+  dateItem:         { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: c.card },
   dayPill:          {},
   dayName:          { fontSize: 11, color: c.textMuted, marginBottom: 3 },
   dateNum:          { fontSize: 17, fontWeight: 'bold', color: c.text },
@@ -222,7 +221,7 @@ const makeStyles = (c: ReturnType<typeof useAppTheme>['colors'], isDark: boolean
   todayDotSelected: { backgroundColor: '#fff' },
   errorBanner:      { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 16, marginBottom: 8, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1 },
   errorText:        { fontSize: 12 },
-  gameList:         { paddingHorizontal: 16, gap: 12, paddingBottom: 24 },
+  gameList:         { paddingHorizontal: 16, gap: 12, paddingBottom: 24, paddingTop: 12 },
   gameCard:            { backgroundColor: c.card, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: c.border },
   gameCardCancelled:   { backgroundColor: isDark ? '#1a1a2e' : '#f1f5f9', borderColor: '#cbd5e1' },
   badgeCancelled:      { opacity: 0.4 },
