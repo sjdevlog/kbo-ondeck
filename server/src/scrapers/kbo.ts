@@ -34,6 +34,41 @@ const TEAM_NAME_MAP: Record<string, string> = {
   '키움':  '키움 히어로즈',
 };
 
+// ─── 경기 일정 (statiz 메인 '다음 경기 일정' 섹션) ──────────────
+export async function scrapeNextSchedule(): Promise<{ date: string; games: object[] }> {
+  const { data } = await axios.get('https://statiz.co.kr', { headers: HEADERS });
+  const $ = cheerio.load(data);
+
+  let scheduleBox: cheerio.Cheerio<cheerio.Element> | null = null;
+  $('.box_head').each((_, el) => {
+    if ($(el).text().includes('다음 경기 일정')) {
+      scheduleBox = $(el).parent() as cheerio.Cheerio<cheerio.Element>;
+    }
+  });
+  if (!scheduleBox) return { date: '', games: [] };
+
+  const date = (scheduleBox as cheerio.Cheerio<cheerio.Element>).find('.box_head .time').text().replace(/[()]/g, '').trim();
+  const games: object[] = [];
+
+  (scheduleBox as cheerio.Cheerio<cheerio.Element>).find('.g_schedule').each((_, el) => {
+    const away    = $(el).find('p').first().text().trim();
+    const home    = $(el).find('p').last().text().trim();
+    const stadium = $(el).find('span a').first().text().trim();
+    const time    = $(el).find('span.time').text().trim();
+    if (!away || !home || !time) return;
+
+    games.push({
+      away:     TEAM_NAME_MAP[away]  ?? away,
+      home:     TEAM_NAME_MAP[home]  ?? home,
+      time,
+      stadium,
+      broadcast: '',
+    });
+  });
+
+  return { date, games };
+}
+
 // ─── 팀 순위 (statiz 메인 페이지 table[2]) ────────────────────
 export async function scrapeStandings() {
   const { data } = await axios.get('https://statiz.co.kr', { headers: HEADERS });
