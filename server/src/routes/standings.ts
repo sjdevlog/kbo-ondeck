@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import { STANDINGS, TEAM_BATTING, TEAM_PITCHING } from '../data/standings';
 import { scrapeStandings } from '../scrapers/kbo';
+import { withCache } from '../cache';
+
+const TTL = 10 * 60 * 1000; // 10분
 
 const router = Router();
 
 // GET /api/standings
 router.get('/', async (_req, res) => {
   try {
-    const data = await scrapeStandings();
+    const data = await withCache('standings', TTL, scrapeStandings);
     res.json(data);
   } catch (e) {
     console.error('[standings] scrape failed, falling back to mock:', e);

@@ -121,7 +121,7 @@ export default function GamesScreen() {
 
       {/* 경기 목록 */}
       <ScrollView contentContainerStyle={s.gameList}>
-        {gamesLoading || weatherLoading ? (
+        {gamesLoading ? (
           Array.from({ length: 5 }).map((_, i) => <GameCardSkeleton key={i} />)
         ) : gamesError ? (
           <EmptyState icon="📡" message="불러오기 실패" sub={gamesError} />
