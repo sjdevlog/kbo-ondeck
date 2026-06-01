@@ -39,18 +39,18 @@ export async function scrapeNextSchedule(): Promise<{ date: string; games: objec
   const { data } = await axios.get('https://statiz.co.kr', { headers: HEADERS });
   const $ = cheerio.load(data);
 
-  let scheduleBox: cheerio.Cheerio<cheerio.Element> | null = null;
+  let scheduleBox: any = null;
   $('.box_head').each((_, el) => {
     if ($(el).text().includes('다음 경기 일정')) {
-      scheduleBox = $(el).parent() as cheerio.Cheerio<cheerio.Element>;
+      scheduleBox = $(el).parent();
     }
   });
   if (!scheduleBox) return { date: '', games: [] };
 
-  const date = (scheduleBox as cheerio.Cheerio<cheerio.Element>).find('.box_head .time').text().replace(/[()]/g, '').trim();
+  const date = scheduleBox.find('.box_head .time').text().replace(/[()]/g, '').trim();
   const games: object[] = [];
 
-  (scheduleBox as cheerio.Cheerio<cheerio.Element>).find('.g_schedule').each((_, el) => {
+  scheduleBox.find('.g_schedule').each((_: number, el: any) => {
     const away    = $(el).find('p').first().text().trim();
     const home    = $(el).find('p').last().text().trim();
     const stadium = $(el).find('span a').first().text().trim();
